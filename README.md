@@ -1,4 +1,7 @@
+
+
 # Deploy-PHP-Laravel-Application-on-Linux-Centos-7-VPS-Server-Guidelines-
+Create **Digital ocean** instance on https://m.do.co/c/1c72f7d5845d and get **100 USD Free Credit** !
 # Initial Setup
 
 > Here we will setup swap file and other necessary things before
@@ -132,7 +135,7 @@ Now restart apache server
 
     sudo systemctl restart httpd.service
 
-Now try to access `youdomain.com`
+Now try to access `youdomain.com` if you have configured your Domain's DNS's **blank**  and **www** A record pointing to your server ip. 
 Congratulations you have succesfully configured php. Now to test mysql connection edit the /var/www/html/test/index.php file 
 
       <?php
@@ -149,5 +152,51 @@ Congratulations you have succesfully configured php. Now to test mysql connectio
     ?> 
 Now save and reload the website. If you see **connected**, then you are good to go.
 
-# To Be Continued ... 
- 
+# # Deploy Laravel Application 
+Now its time to deploy our laravel application. First we will install composer and git. 
+### Install composer 
+
+    curl -sS https://getcomposer.org/installer | php
+    mv composer.phar /usr/bin/composer
+    chmod +x /usr/bin/composer
+### Install git 
+
+    sudo yum -y install git
+Now you can clone or upload your web applications file on /var/www/html directory in appropriate folder. 
+For example we will simply just create an application to test login registration functionality. 
+
+    composer create-project --prefer-dist laravel/laravel testapp "5.8.*"
+#### Set file permission 
+
+    chown -R apache.apache /var/www/html/testapp 
+    chmod -R 755 /var/www/html/testapp 
+    chmod -R 755 /var/www/html/testapp/storage
+    chcon -R -t httpd_sys_rw_content_t /var/www/html/testapp/storage
+
+Configure the .env file with database credentials. Run migrations 
+
+    php artisan migrate 
+To access using your domain , edit the test.conf file /etc/httpd/conf.d directory. You can add more conf files too.
+
+    <VirtualHost *:80>
+           ServerName yourdomain.com
+           DocumentRoot /var/www/html/testapp/public
+    
+           <Directory /var/www/html/testapp>
+                  AllowOverride All
+           </Directory>
+    </VirtualHost>
+Here we added the document root which is the root directory of your laravel project's root directory. 
+Now restart apache server 
+
+    service httpd restart 
+Now if you try to access the application by your domain you can access, But when trying to registering, you may get an **sql permission denied** error. To solve this run following command. 
+
+    sudo setsebool httpd_can_network_connect_db 1
+It will enable apache to connect with database. 
+
+# Enjoy ! Keep eyes on this doc. 
+### Future Updates 
+- Configure Cloudflare SSL certificate
+- Configure  SSH 
+- Change phpmyadmin address 
