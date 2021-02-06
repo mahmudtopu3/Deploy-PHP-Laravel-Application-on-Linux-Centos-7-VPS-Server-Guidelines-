@@ -127,7 +127,7 @@ Create **test.conf** and Add the following lines.
     <VirtualHost *:80>
            ServerName youdomain.com
            DocumentRoot /var/www/html/test
-           <Directory /var/www/test>
+           <Directory /var/www/html/test>
                   AllowOverride All
            </Directory>
     </VirtualHost>
