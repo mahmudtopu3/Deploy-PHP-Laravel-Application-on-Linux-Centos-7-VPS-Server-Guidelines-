@@ -192,7 +192,8 @@ Now restart apache server
     service httpd restart 
 Now if you try to access the application by your domain you can access, But when trying to registering, you may get an **sql permission denied** error. To solve this run following command. 
 
-    sudo setsebool httpd_can_network_connect_db 1
+    sudo -P setsebool httpd_can_network_connect_db 1
+    
 It will enable apache to connect with database. 
 
 # Enjoy ! Keep eyes on this doc. 
